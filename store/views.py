@@ -54,3 +54,24 @@ def cart(request):
     total_quantity = sum([item.quantity for item in cart_items])
 
     return render(request, 'cart.html', {'cart_items': cart_items, 'total_price': total_price, 'total_quantity': total_quantity})
+
+
+def edit_cart_item(request, pk):
+    cart_item = CartItem.objects.get(pk=pk)
+    action = request.GET.get('action')
+
+    if action == 'take' and cart_item.quantity > 0:
+        if cart_item.quantity == 1:
+            cart_item.delete()
+            return redirect('store:cart')
+        cart_item.quantity -= 1
+        cart_item.save()
+        return redirect('store:cart')
+    cart_item.quantity += 1
+    cart_item.save()
+    return redirect('store:cart')
+
+def delete_cart_item(request, pk):
+    cart_item = CartItem.objects.get(pk=pk)
+    cart_item.delete()
+    return redirect('store:cart')

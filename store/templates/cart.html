@@ -139,9 +139,22 @@
           <td>{{ item.quantity }}</td>
           <td>{{ item.total_price }} sum</td>
           <td>
-            <a href="#" class="trash-icon">
+
+            <div class="quantity ml-3">
+              <a href="{% url 'store:edit_cart_item' item.id %}?action=add">
+                  <img src="{% static '/img/up-arrow.png' %}" class="arrows" width="20px" height="20px" alt="">
+              </a>
+
+              <a href="{% url 'store:edit_cart_item' item.id %}?action=take">
+                  <img src="{% static '/img/down-arrow.png' %}" width="20px" height="20px" class="arrows" alt="">
+              </a>
+            </div>
+
+            <!-- DELETE BUTTON yangi URLga moslashtirilgan -->
+            <a href="{% url 'store:delete_cart_item' item.id %}" class="trash-icon" title="Remove item">
               <ion-icon name="trash-outline"></ion-icon>
             </a>
+
           </td>
         </tr>
         {% empty %}

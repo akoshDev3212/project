@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  body {
+    background: #f9f9f9;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .product-detail-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-wrap: wrap;
+    overflow: hidden;
+  }
+
+  .product-detail-image {
+    flex: 1 1 45%;
+    background: #f0f0f0;
+  }
+
+  .product-detail-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .product-detail-info {
+    flex: 1 1 55%;
+    padding: 35px;
+  }
+
+  .product-detail-info h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 15px;
+  }
+
+  .product-detail-info p {
+    font-size: 15px;
+    color: #555;
+    line-height: 1.7;
+  }
+
+  .product-detail-price {
+    font-size: 22px;
+    font-weight: 600;
+    color: #ff4d4d;
+    margin: 20px 0;
+  }
+
+  .btn-add {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+  }
+
+  .btn-add:hover {
+    background: #0056b3;
+  }
+
+  /* --- COMMENT SECTION --- */
+  .comment-section {
+    max-width: 800px;
+    margin: 60px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .comment-section h3 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .comment-form textarea {
+    width: 100%;
+    height: 80px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 10px 15px;
+    font-size: 15px;
+    resize: none;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+
+  .comment-form textarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0,123,255,0.3);
+  }
+
+  .comment-form button {
+    margin-top: 15px;
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: 0.3s;
+  }
+
+  .comment-form button:hover {
+    background: #0056b3;
+  }
+
+  .comment-list {
+    margin-top: 30px;
+  }
+
+  .comment-card {
+    background: #f8f9fa;
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    border-left: 5px solid #007bff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .comment-card i {
+    color: #007bff;
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  .comment-text {
+    color: #444;
+    margin-top: 5px;
+  }
+
+  @media (max-width: 768px) {
+    .product-detail-container {
+      flex-direction: column;
+    }
+  }
+</style>
+
+<div class="container">
+  <div class="product-detail-container">
+    <div class="product-detail-image">
+      {% if product.image %}
+        <img src="{{ product.image.url }}" alt="{{ product.title }}">
+      {% else %}
+        <img src="{% static 'images/no-image.jpg' %}" alt="Rasm mavjud emas">
+      {% endif %}
+    </div>
+
+    <div class="product-detail-info">
+      <h2>{{ product.title }}</h2>
+      <p>{{ product.description }}</p>
+      <div class="product-detail-price">{{ product.price }} so‘m</div>
+      <button class="btn-add">🛒 Savatga qo‘shish</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMMENT SECTION -->
+<div class="comment-section">
+  <h3>💬 Fikrlar</h3>
+  <form class="comment-form" action="{% url 'store:leave_comment' product.pk %}" method="POST">
+    {% csrf_token %}
+    <textarea name="comment_text" placeholder="Komment yozing..."></textarea>
+    <button type="submit">Kommentni qo‘shish</button>
+  </form>
+
+  <div class="comment-list">
+    {% for comment in product.comments.all %}
+      <div class="comment-card">
+        <i>{{ comment.author }}</i>
+        <div class="comment-text">{{ comment.comment_text }}</div>
+      </div>
+    {% empty %}
+      <p>Hozircha hech qanday komment yo‘q. Birinchi bo‘lib yozing!</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

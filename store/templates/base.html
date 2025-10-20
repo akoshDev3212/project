@@ -1,0 +1,220 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}MyShop{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #e3f2fd, #f8f9fa);
+      min-height: 200vh;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* 🔹 Floating Navbar (uzunroq + tiniq) */
+    .floating-navbar {
+      position: fixed;
+      top: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 96%;
+      background: rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 70px;
+      box-shadow: 0 8px 35px rgba(0, 0, 0, 0.15);
+      transition: all 0.4s ease;
+      z-index: 1000;
+      padding: 12px 40px;
+    }
+
+    .floating-navbar.scrolled {
+      top: 10px;
+      width: 94%;
+      transform: translateX(-50%) scale(0.985);
+      background: rgba(255, 255, 255, 0.55);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: #000 !important;
+      letter-spacing: 0.5px;
+      transition: 0.3s;
+    }
+
+    .navbar-brand:hover {
+      color: #222 !important;
+    }
+
+    .nav-link {
+      color: #000 !important;
+      font-weight: 500;
+      margin: 0 15px;
+      position: relative;
+      transition: 0.3s;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      left: 0;
+      bottom: -4px;
+      background-color: #000;
+      transition: width 0.3s;
+    }
+
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    /* 🔹 Search bar */
+    .search-bar form {
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 50px;
+      padding: 5px 15px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .search-bar form:hover {
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .search-bar input[type="text"] {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 15px;
+      color: #000;
+      width: 180px;
+      transition: width 0.3s ease;
+    }
+
+    .search-bar input[type="text"]:focus {
+      width: 250px;
+    }
+
+    .search-bar button {
+      border: none;
+      background: linear-gradient(135deg, #007bff, #00c6ff);
+      color: #fff;
+      border-radius: 25px;
+      padding: 6px 14px;
+      font-weight: 600;
+      font-size: 14px;
+      margin-left: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .search-bar button:hover {
+      background: linear-gradient(135deg, #0062cc, #00aaff);
+      transform: translateY(-2px);
+    }
+
+    .btn-login, .btn-signup {
+      border-radius: 25px;
+      padding: 6px 15px;
+      font-weight: 600;
+      border: none;
+      transition: 0.3s;
+      color: #000;
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .btn-login:hover, .btn-signup:hover {
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    footer {
+      background: #0d1117;
+      color: #bbb;
+      text-align: center;
+      padding: 20px 0;
+      margin-top: 100px;
+    }
+
+    @media (max-width: 992px) {
+      .search-bar { margin: 10px 0; }
+      .floating-navbar { width: 98%; padding: 8px 20px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 🔹 Transparent Floating Navbar -->
+  <nav class="navbar navbar-expand-lg floating-navbar">
+    <div class="container-fluid justify-content-between px-4">
+      <a class="navbar-brand" href="{% url 'store:store' %}">MyShop</a>
+
+      <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+        <ul class="navbar-nav mb-0">
+          <li class="nav-item"><a class="nav-link" href="{% url 'store:cart' %}">🛒 Savat</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Mahsulotlar</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Aksiya</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Aloqa</a></li>
+        </ul>
+      </div>
+
+      <!-- 🔹 Search bar -->
+      <div class="search-bar mx-3">
+        <form action="{% url 'store:search_result' %}" method="GET">  
+          <input type="text" name="search" placeholder="🔍 Qidiruv..." value="{{ request.GET.search }}">
+          <button type="submit">Qidirish</button>
+        </form>
+      </div>
+
+      <div class="d-flex align-items-center">
+        {% if user.is_authenticated %}
+          <span class="text-dark me-2">👋 {{ user.username }}</span>
+          <a href="{% url 'users:sign_out'%}" class="btn btn-login btn-sm">Chiqish</a>
+        {% else %}
+          <a href="{% url 'users:sign_in' %}" class="btn btn-login btn-sm">Login</a>
+          <a href="{% url 'users:sign_up' %}" class="btn btn-signup btn-sm">Sign Up</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <!-- 🔹 Content -->
+  <div class="container my-5 pt-5">
+    {% block content %}
+    {% endblock %}
+  </div>
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    window.addEventListener("scroll", function() {
+      const navbar = document.querySelector(".floating-navbar");
+      if (window.scrollY > 20) {
+        navbar.classList.add("scrolled");
+      } else {
+        navbar.classList.remove("scrolled");
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  body {
+    background: #f9f9f9;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  /* 🔹 Qidiruv paneli */
+  .search-section {
+    max-width: 700px;
+    margin: 60px auto 40px auto;
+    text-align: center;
+  }
+
+  .search-section form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 40px;
+    padding: 8px 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(8px);
+  }
+
+  .search-section input[type="text"] {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 10px 15px;
+    font-size: 16px;
+    outline: none;
+    color: #222;
+  }
+
+  .search-section button {
+    background: linear-gradient(135deg, #007bff, #00c6ff);
+    border: none;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .search-section button:hover {
+    background: linear-gradient(135deg, #0062cc, #00aaff);
+    transform: translateY(-2px);
+  }
+
+  /* 🔹 Natijalar kartalari */
+  .search-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 15px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 25px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-content {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .media-content {
+    flex: 1 1 60%;
+    padding-right: 20px;
+  }
+
+  .media-content .title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #222;
+  }
+
+  .media-content p {
+    font-size: 15px;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  .media-content time {
+    font-size: 14px;
+    color: #777;
+  }
+
+  .media-left {
+    flex: 1 1 35%;
+    text-align: right;
+  }
+
+  .media-left img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 12px;
+    transition: transform 0.3s ease;
+  }
+
+  .card:hover .media-left img {
+    transform: scale(1.03);
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  hr {
+    margin-top: 10px;
+    border: 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  @media (max-width: 768px) {
+    .card-content {
+      flex-direction: column-reverse;
+      text-align: center;
+    }
+
+    .media-left img {
+      width: 100%;
+      height: 250px;
+      margin-bottom: 15px;
+    }
+
+    .media-content {
+      padding-right: 0;
+    }
+
+    .search-section form {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .search-section input[type="text"] {
+      text-align: center;
+    }
+  }
+</style>
+
+
+
+<!-- 🔹 Natijalar -->
+<div class="search-container">
+  {% if search_obj %}
+    {% for post in search_obj %}
+    <div class="card">
+      <a href="{{ post.get_absolute_url }}">
+        <div class="card-content">
+          <div class="media-content">
+            <p class="title">{{ post.title }}</p>
+            <p>{{ post.description|truncatechars:200 }}</p>
+            <br>
+            <span class="is-flex">
+              <img src="{% static 'horoscope/img/calendar.png' %}" style="width:20px;" alt="">
+              &nbsp;
+              <time datetime="{{ post.date }}">{{ post.date|date:"F, Y" }}</time>
+            </span>
+          </div>
+
+          <div class="media-left">
+            {% if post.image %}
+              <img src="{{ post.image.url }}" alt="{{ post.title }}">
+            {% else %}
+              <img src="{% static 'images/no-image.jpg' %}" alt="Rasm yo‘q">
+            {% endif %}
+          </div>
+        </div>
+      </a>
+      <hr>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p style="text-align:center; font-size:18px;">Hech narsa topilmadi 😔</p>
+  {% endif %}
+</div>
+
+{% endblock %}

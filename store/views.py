@@ -1,8 +1,9 @@
 from django.shortcuts import render,reverse, redirect
-from .models import Products, Slide, CartItem
+from .models import Products, Slide, CartItem, Order, OrderProdect
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect,Http404
-from .models import Comment
+from .models import Comment, CartItem
+from . import forms
 def store(request):
     product_id = request.GET.get('product')
     slides = Slide.objects.all()
@@ -71,7 +72,46 @@ def edit_cart_item(request, pk):
     cart_item.save()
     return redirect('store:cart')
 
+
+
 def delete_cart_item(request, pk):
     cart_item = CartItem.objects.get(pk=pk)
     cart_item.delete()
     return redirect('store:cart')
+
+
+def create_order(request):
+    cart_items = CartItem.objects.all()
+    total_price = sum([item.total_price() for item in cart_items])
+    amount = sum([item.quantity for item in cart_items])
+    form = forms.OrderForm(request.POST)
+
+    if request.method == 'POST' and form.is_valid():
+        order = Order.objects.create(
+            address=request.POST.get('address'),
+            phone=request.POST.get('phone'),
+            total_price=total_price,
+            User=request.user
+        )
+        for cart_item in cart_items:
+            OrderProdect.objects.create(
+                order=order,
+                product=cart_item.product,
+                amount=cart_item.quantity,
+                total=cart_item.total_price(),
+            )
+
+        cart_items.delete()
+        return redirect('store:store')
+    form = forms.OrderForm()
+    return render(request, 'order_creation_page.html', {
+        'cart_items': cart_items,
+        'total_price': total_price,
+        'amount': amount,
+        'form': form
+    })
+
+
+def orders(request):
+    orders_list = Order.objects.filter(User=request.user)
+    return render(request, 'orders.html', {'orders': orders_list})

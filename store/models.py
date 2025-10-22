@@ -49,3 +49,21 @@ class CartItem(models.Model):
     
     def total_price(self):
         return self.product.price * self.quantity
+    
+class Order(models.Model):
+    address = models.CharField(max_length=255, null=True, blank=True)
+    phone = models.CharField(max_length=255, null=True)
+    User = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    total_price = models.IntegerField()
+
+    def __str__(self):
+        return 'Order # %s' % (str(self.id))
+    
+class OrderProdect(models.Model):
+    order = models.ForeignKey('store.Order', on_delete=models.CASCADE,related_name='order_products', null=True)
+    product = models.ForeignKey('store.Products', on_delete=models.CASCADE)
+    amount = models.IntegerField()
+    total = models.IntegerField()
+
+    def __str__(self):
+        return '%s x%s' % (self.product.title, self.amount)

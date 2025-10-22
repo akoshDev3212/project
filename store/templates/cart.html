@@ -112,7 +112,7 @@
       <div>Items: {{ total_quantity }}</div>
       <div>Total: <strong>{{ total_price }}</strong> sum</div>
     </div>
-    <button class="btn btn-info text-white">Checkout</button>
+    <a href="{% url 'store:create_order' %}" class="btn btn-info text-white">Checkout</a>
   </div>
 
   <!-- Table -->

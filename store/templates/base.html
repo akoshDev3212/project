@@ -9,6 +9,8 @@
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
   <style>
     body {
@@ -19,7 +21,6 @@
       padding: 0;
     }
 
-    /* 🔹 Floating Navbar (uzunroq + tiniq) */
     .floating-navbar {
       position: fixed;
       top: 25px;
@@ -28,9 +29,8 @@
       width: 96%;
       background: rgba(255, 255, 255, 0.35);
       backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
-      border: 1px solid rgba(0, 0, 0, 0.1);
       border-radius: 70px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
       box-shadow: 0 8px 35px rgba(0, 0, 0, 0.15);
       transition: all 0.4s ease;
       z-index: 1000;
@@ -49,12 +49,6 @@
       font-weight: 700;
       font-size: 1.5rem;
       color: #000 !important;
-      letter-spacing: 0.5px;
-      transition: 0.3s;
-    }
-
-    .navbar-brand:hover {
-      color: #222 !important;
     }
 
     .nav-link {
@@ -91,11 +85,6 @@
       transition: all 0.3s ease;
     }
 
-    .search-bar form:hover {
-      background: rgba(255, 255, 255, 0.9);
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-
     .search-bar input[type="text"] {
       border: none;
       outline: none;
@@ -104,10 +93,6 @@
       color: #000;
       width: 180px;
       transition: width 0.3s ease;
-    }
-
-    .search-bar input[type="text"]:focus {
-      width: 250px;
     }
 
     .search-bar button {
@@ -128,18 +113,33 @@
       transform: translateY(-2px);
     }
 
-    .btn-login, .btn-signup {
-      border-radius: 25px;
-      padding: 6px 15px;
-      font-weight: 600;
+    /* 🎤 Yangi mikrofon dizayni */
+    #micButton {
+      width: 40px;
+      height: 40px;
       border: none;
-      transition: 0.3s;
-      color: #000;
-      background: rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      background: linear-gradient(135deg, #007bff, #00c6ff);
+      color: white;
+      font-size: 18px;
+      margin-left: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
     }
 
-    .btn-login:hover, .btn-signup:hover {
-      background: rgba(0, 0, 0, 0.1);
+    #micButton:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 18px rgba(0, 123, 255, 0.45);
+    }
+
+    #micButton.listening {
+      background: linear-gradient(135deg, #ff4b2b, #ff416c);
+      box-shadow: 0 0 20px rgba(255, 65, 108, 0.6);
+      transform: scale(1.15);
     }
 
     footer {
@@ -149,17 +149,11 @@
       padding: 20px 0;
       margin-top: 100px;
     }
-
-    @media (max-width: 992px) {
-      .search-bar { margin: 10px 0; }
-      .floating-navbar { width: 98%; padding: 8px 20px; }
-    }
   </style>
 </head>
 
 <body>
-
-  <!-- 🔹 Transparent Floating Navbar -->
+  <!-- 🔹 Floating Navbar -->
   <nav class="navbar navbar-expand-lg floating-navbar">
     <div class="container-fluid justify-content-between px-4">
       <a class="navbar-brand" href="{% url 'store:store' %}">MyShop</a>
@@ -177,11 +171,14 @@
         </ul>
       </div>
 
-      <!-- 🔹 Search bar -->
+      <!-- 🔹 Search bar + ovozli qidiruv -->
       <div class="search-bar mx-3">
-        <form action="{% url 'store:search_result' %}" method="GET">  
-          <input type="text" name="search" placeholder="🔍 Qidiruv..." value="{{ request.GET.search }}">
+        <form id="voice-search-form" action="{% url 'store:search_result' %}" method="GET">
+          <input type="text" id="searchInput" name="search" placeholder="🔍 Qidiruv..." value="{{ request.GET.search }}">
           <button type="submit">Qidirish</button>
+          <button type="button" id="micButton" title="Ovozli qidiruv">
+            <i class="bi bi-mic"></i>
+          </button>
         </form>
       </div>
 
@@ -207,14 +204,42 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    // 🔹 Navbar scroll effekti
     window.addEventListener("scroll", function() {
       const navbar = document.querySelector(".floating-navbar");
-      if (window.scrollY > 20) {
-        navbar.classList.add("scrolled");
-      } else {
-        navbar.classList.remove("scrolled");
-      }
+      navbar.classList.toggle("scrolled", window.scrollY > 20);
     });
+
+    // 🎤 Ovozli qidiruv (SpeechRecognition)
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.lang = "uz-UZ";
+      recognition.interimResults = false;
+
+      const micButton = document.getElementById("micButton");
+      const searchInput = document.getElementById("searchInput");
+      const form = document.getElementById("voice-search-form");
+
+      micButton.onclick = () => {
+        recognition.start();
+        micButton.classList.add("listening");
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        searchInput.value = transcript;
+        micButton.classList.remove("listening");
+        form.submit();
+      };
+
+      recognition.onerror = (event) => {
+        alert("Xatolik: " + event.error);
+        micButton.classList.remove("listening");
+      };
+    } else {
+      alert("Sizning brauzeringiz ovozli qidiruvni qo‘llab-quvvatlamaydi 😕");
+    }
   </script>
 </body>
 </html>

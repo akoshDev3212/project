@@ -1,57 +1,165 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <div class="container">
-        <div class="columns">
-            <div class="column">
-                <div class="box">
-                    <form method="post" action="{% url 'store:create_order' %}" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <div class="title">
-                            Shipping Information:
-                        </div>
-                        {% for field in form %}
-                            <div class="field">
-                                <label for="{{ field.id_for_label }}" class="label">{{ field.label }}</label>
-                                {{ field }}
-                            </div>
-                        {% endfor %}
-                        <button type="submit" class="button is-fullwidth is-success">Submit</button>
-                    </form>
-                </div>
+<style>
+  body {
+    background: #f7f8fa;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .container {
+    margin-top: 50px;
+    margin-bottom: 50px;
+  }
+
+  .box {
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+    background: #fff;
+    padding: 2rem;
+    transition: all 0.3s ease;
+  }
+
+  .box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  .title {
+    color: #2b2b2b;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+  }
+
+  .label {
+    color: #444;
+    font-weight: 500;
+  }
+
+  input, select, textarea {
+    border-radius: 8px !important;
+    border: 1px solid #dcdcdc !important;
+    padding: 10px !important;
+  }
+
+  .button.is-success {
+    background: linear-gradient(135deg, #00b09b, #96c93d);
+    color: #fff;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: 0.3s;
+  }
+
+  .button.is-success:hover {
+    background: linear-gradient(135deg, #00c48c, #7ed957);
+  }
+
+  .button.is-danger {
+    background: #ff4b5c;
+    color: white;
+    font-weight: 500;
+    border-radius: 8px;
+  }
+
+  .button.is-danger:hover {
+    background: #ff6b7a;
+  }
+
+  .table {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .table thead {
+    background: #f0f0f0;
+  }
+
+  .table td {
+    vertical-align: middle;
+  }
+
+  img {
+    border-radius: 8px;
+  }
+
+  .title.is-size-4 {
+    color: #222;
+    font-weight: 600;
+  }
+</style>
+
+<div class="container">
+  <div class="columns is-variable is-6">
+    <!-- Shipping Information -->
+    <div class="column is-6">
+      <div class="box">
+        <form method="post" action="{% url 'store:create_order' %}" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="title is-4 mb-4">
+            <span class="icon has-text-success"><i class="fas fa-shipping-fast"></i></span>
+            Shipping Information
+          </div>
+
+          {% for field in form %}
+            <div class="field mb-3">
+              <label for="{{ field.id_for_label }}" class="label">{{ field.label }}</label>
+              <div class="control">
+                {{ field }}
+              </div>
             </div>
-            <div class="column is-6">
-                <div class="box">
-                    <a class="button is-danger" href="{% url 'store:cart' %}">Back to cart</a>
-                    <hr>
-                    <div class="title">Order Summary</div>
-                    <table class="table is-fullwidth">
-                        <thead>
-                        <tr class="has-text-weight-bold">
-                            <td></td>
-                            <td>Product</td>
-                            <td>Price</td>
-                            <td>Quantity</td>
-                            <td>Total</td>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for item in cart_items %}
-                            <tr>
-                                <td>
-                                    <img src="{{ item.product.thumb.url }}" alt="" width="50" height="50">
-                                </td>
-                                <td>{{ item }}</td>
-                                <td>{{ item.product.price }} sum</td>
-                                <td>x {{ item.quantity }}</td>
-                                <td>{{ item.total_price }}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                    <p class="title is-size-4">Total: {{ total_price }} sum </p>
-                </div>
-            </div>
-        </div>
+          {% endfor %}
+          <button type="submit" class="button is-fullwidth is-success mt-4">
+            <i class="fas fa-check-circle mr-2"></i> Submit Order
+          </button>
+        </form>
+      </div>
     </div>
+
+    <!-- Order Summary -->
+    <div class="column is-6">
+      <div class="box">
+        <div class="is-flex is-justify-content-space-between mb-3">
+          <a class="button is-danger" href="{% url 'store:cart' %}">
+            <i class="fas fa-arrow-left mr-1"></i> Back to cart
+          </a>
+        </div>
+        <hr>
+        <div class="title is-4">Order Summary</div>
+
+        <table class="table is-fullwidth">
+          <thead>
+            <tr class="has-text-weight-bold">
+              <td></td>
+              <td>Product</td>
+              <td>Price</td>
+              <td>Quantity</td>
+              <td>Total</td>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in cart_items %}
+              <tr>
+                <td>
+                  <img src="{{ item.product.image.url }}" alt="" width="50" height="50">
+                </td>
+                <td>{{ item }}</td>
+                <td>{{ item.product.price }} sum</td>
+                <td>x {{ item.quantity }}</td>
+                <td>{{ item.total_price }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <p class="title is-size-4 has-text-right mt-4">
+          Total: <span class="has-text-success">{{ total_price }} sum</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Font Awesome -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 {% endblock %}

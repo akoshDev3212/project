@@ -1,5 +1,5 @@
 from django import forms
-from .models import Order
+from .models import Order, Review, RATE_CHOICES
 
 class OrderForm(forms.Form):
     adress = forms.CharField(label='Write your adress',)
@@ -8,3 +8,13 @@ class OrderForm(forms.Form):
     class Meta:
         model = Order
         fields = ['phone', 'adress']
+
+
+class RateForm(forms.ModelForm):
+    text = forms.CharField(widget=forms.Textarea(attrs={'class':'textarea'}), label='Fikringizni yozing')
+    rate = forms.ChoiceField(choices=RATE_CHOICES,required=True, label='baholash 1 dan 5 gacha')
+
+
+    class Meta:
+        model = Review
+        fields = ['text','rate']

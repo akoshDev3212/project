@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  body {
+    background: linear-gradient(135deg, #eef2f3, #ffffff);
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .product-container {
+    max-width: 1200px;
+    margin: 60px auto;
+  }
+
+  .product-card {
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 25px rgba(0,0,0,0.08);
+    overflow: hidden;
+    transition: 0.3s;
+  }
+
+  .product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+  }
+
+  .product-image img {
+    width: 100%;
+    border-radius: 15px;
+    object-fit: cover;
+  }
+
+  .tag-new {
+    background: #dc3545;
+    color: white;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+
+  .tag-discount {
+    background: #0d6efd;
+    color: white;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+
+  .review-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+    transition: 0.3s;
+  }
+
+  .review-card:hover {
+    transform: translateY(-3px);
+  }
+
+  .review-avatar img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+  }
+
+  .rating-star {
+    color: #fbc02d;
+    font-size: 1.2rem;
+  }
+
+  .form-select, .form-control {
+    border-radius: 10px;
+  }
+
+  .btn-custom {
+    border-radius: 10px;
+    font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
+    .product-container {
+      margin: 30px 10px;
+    }
+  }
+</style>
+
+<div class="product-container">
+  <div class="row g-4 align-items-center">
+    <!-- Mahsulot rasmi -->
+    <div class="col-md-5">
+      <div class="product-card p-3">
+        <div class="product-image">
+          <img src="{{ product.thumb.url }}" alt="{{ product.title }}">
+        </div>
+      </div>
+    </div>
+
+    <!-- Mahsulot ma’lumotlari -->
+    <div class="col-md-7">
+      <div class="product-card p-4">
+        <h2 class="fw-bold">{{ product.title }}</h2>
+
+        {% if product.is_new %}
+          <span class="tag-new me-2">🆕 New!</span>
+        {% endif %}
+        {% if product.is_discounted %}
+          <span class="tag-discount">💸 Discount!</span>
+        {% endif %}
+
+        <p class="text-secondary mt-3">{{ product.description }}</p>
+
+        <form action="{% url 'store:rate_product' product.pk %}" method="post" class="mt-4">
+          {% csrf_token %}
+          {% for field in form %}
+            <div class="mb-3">
+              <label class="form-label fw-semibold">{{ field.label }}</label>
+              {{ field }}
+            </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-success btn-custom px-4">Submit</button>
+          <a href="{% url 'store:products_detail' product.pk %}" class="btn btn-outline-danger btn-custom ms-2 px-4">
+            Back
+          </a>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <hr class="my-5">
+
+  <!-- Foydalanuvchi sharhlari -->
+  <div class="text-center mb-4">
+    <h3 class="fw-bold">Reviews of other clients</h3>
+  </div>
+
+  {% if reviews %}
+    <div class="row g-4">
+      {% for review in reviews %}
+      <div class="col-md-6">
+        <div class="review-card p-4 h-100">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="d-flex align-items-center">
+              <div class="review-avatar me-3">
+                <img src="https://bulma.io/images/placeholders/96x96.png" alt="user">
+              </div>
+              <div>
+                <h5 class="mb-0">{{ review.user.first_name }}</h5>
+                <small class="text-muted">@{{ review.user.username }}</small>
+              </div>
+            </div>
+            <small class="text-muted">{{ review.date }}</small>
+          </div>
+          <p class="mt-3 text-secondary">{{ review.text }}</p>
+          <div class="mt-2">
+            <span class="rating-star">⭐</span>
+            <strong>{{ review.rate }}</strong> / 5
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-center text-muted fs-5 mt-4">No reviews yet. Be first to leave one 😊</p>
+  {% endif %}
+</div>
+{% endblock %}

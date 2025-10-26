@@ -1,5 +1,5 @@
 from django.shortcuts import render,reverse, redirect
-from .models import Products, Slide, CartItem, Order, OrderProdect
+from .models import Products, Slide, CartItem, Order, OrderProdect, Review
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect,Http404
 from .models import Comment, CartItem
@@ -115,3 +115,19 @@ def create_order(request):
 def orders(request):
     orders_list = Order.objects.filter(User=request.user)
     return render(request, 'orders.html', {'orders': orders_list})
+
+
+def rate_product(request, pk):
+    product = Products.objects.get(pk=pk)
+    reviews = Review.objects.filter(product=product)
+
+    if request.method == 'POST':
+        form = forms.RateForm(request.POST)
+        if form.is_valid():
+            rating = form.save(commit=False)
+            rating.user = request.user
+            rating.product = product
+            rating.save()
+            return redirect('store:rate_product', pk=pk)
+    form = forms.RateForm()
+    return render(request, 'rate.html', {'form': form, 'product': product, 'reviews': reviews})

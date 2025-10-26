@@ -177,6 +177,10 @@
     <button type="submit">Kommentni qo‘shish</button>
   </form>
 
+<hr>
+<a href="{% url 'store:rate_product' product.pk %}">Rate</a>
+<hr>
+
   <div class="comment-list">
     {% for comment in product.comments.all %}
       <div class="comment-card">
